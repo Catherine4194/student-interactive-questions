@@ -1,0 +1,162 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh; /* 保证网页至少有一个视口高度 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* 垂直居中页面内容 */
+}
+
+.container {
+    width: 90%; /* 使用更大宽度比例 */
+    max-width: 800px; /* 增大最大宽度限制 */
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    margin: 20px; /* 增加整体的页面垂直间距 */
+}
+
+h3 {
+    margin-bottom: 20px; /* 为标题增加间距 */
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#questionImageContainer {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0; /* 图片容器的垂直间距 */
+}
+
+#questionImage{
+    max-width: 80%; /* 限制图片最大宽度为容器宽度的80% */
+    height: auto;
+    display: block;
+    margin: 0 auto; /* 图片本身居中 */
+}
+
+
+#questionText, #taskDetails, #interactiveArea, #inputs, #explanation, #hintSection, button {
+    margin-bottom: 30px; /* 为每个元素增加间距 */
+    text-align: left;
+}
+#questionText {
+    margin-bottom: 30px; /* 保留底部间距 */
+    text-align: left; /* 设置文本左对齐 */
+    line-height: 1.5; /* 设置行高为1.5倍，增加每行间距 */
+}
+#hintList {
+    text-align: left;
+    list-style: none;  /* 去掉默认列表样式 */
+    padding: 0;  /* 清除默认内边距 */
+    margin: 0;  /* 清除默认外边距 */
+}
+
+.hint-btn {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.hint-btn:hover {
+    background-color: #2980b9;
+}
+
+.hidden {
+    display: none;
+    text-align: left;
+}
+
+.choice-btn {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+    font-size: 16px;
+}
+
+
+/* 使文本区域居中，并设置其宽度 */
+textarea#explanation {
+    display: block;  /* 将其变为块元素，便于居中 */
+    margin: 20px auto;  /* 上下边距为20px，水平居中 */
+    width: 80%;  /* 设置宽度为80% */
+    max-width: 600px;  /* 设置最大宽度为400px，以适应不同屏幕 */
+    height: 50px;  /* 高度调整为50px */
+    padding: 10px;  /* 内部填充，增加舒适度 */
+    font-size: 16px;  /* 字体大小 */
+    border: 1px solid #ccc;  /* 边框样式 */
+    border-radius: 5px;  /* 边框圆角 */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);  /* 轻微阴影，增加层次感 */
+}
+
+
+button {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+.pyramid-row {
+    display: flex;
+    justify-content: center;
+    margin: 1px 0;
+}
+
+.pyramid-row {
+    display: flex;
+    justify-content: center;
+    margin: 5px 0; /* 为每一行金字塔增加适当间距 */
+}
+
+.box {
+    width: 60px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #000;
+    margin: 0 2px; /* 设置左右间距确保布局正常 */
+    background-color: #f3f3f3;
+}
+
+.box input {
+    width: 50px; /* 调整输入框宽度 */
+    height: 20px; /* 调整输入框高度 */
+    text-align: center;
+    border: 1px solid #000;
+    background-color: white;
+}
+
+
+.highlight {
+    background-color: yellow;
+}
+
+
