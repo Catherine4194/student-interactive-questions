@@ -501,14 +501,28 @@ function navigate(next) {
     const category = params.get('category') || 'C';
     let questionNumber = parseInt(params.get('question')) || 1;
 
-    // 如果是返回上一题
-    if (!next && questionNumber === 1) {
-        // 如果已经是第一题，返回到 selection.html
-        window.location.href = 'selection.html';
-    } else {
-        // 否则跳到上一题或下一题
-        questionNumber += next ? 1 : -1;
+    // 获取当前题目的 ID
+    const currentQuestionId = `${category}${questionNumber}`;
 
+    // 如果是返回上一题
+    if (!next) {
+        // 检查是否是 A1、C1 或 D1，若是，则返回到 selection.html
+        if (currentQuestionId === 'A1' || currentQuestionId === 'C1' || currentQuestionId === 'D1') {
+            window.location.href = 'selection.html';
+        } else {
+            // 否则返回上一题
+            questionNumber -= 1;
+            const previousQuestionId = `${category}${questionNumber}`;
+            if (questionData[previousQuestionId]) {
+                history.pushState(null, '', `?category=${category}&question=${questionNumber}`);
+                loadQuestion(previousQuestionId);
+            } else {
+                alert("No previous question available.");
+            }
+        }
+    } else {
+        // 否则，跳到下一题
+        questionNumber += 1;
         const nextQuestionId = `${category}${questionNumber}`;
 
         if (questionData[nextQuestionId]) {
@@ -519,6 +533,7 @@ function navigate(next) {
         }
     }
 }
+
 
 
 async function submitAnswers() {
