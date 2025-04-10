@@ -506,8 +506,8 @@ function navigate(next) {
 
     // 如果是返回上一题
     if (!next) {
-        // 检查是否是 A1、C1 或 D1，若是，则返回到 selection.html
-        if (currentQuestionId === 'A1' || currentQuestionId === 'C1' || currentQuestionId === 'D1') {
+        // 检查是否是 A1、B1,C1，若是，则返回到 selection.html
+        if (currentQuestionId === 'A1' || currentQuestionId === 'B1' || currentQuestionId === 'C1') {
             window.location.href = 'selection.html';
         } else {
             // 否则返回上一题
