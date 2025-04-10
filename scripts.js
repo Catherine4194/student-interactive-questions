@@ -104,7 +104,7 @@ const questionData = {
         ),
         "img": "img/A/a5.png",
         "choices": ["A. 4", "B. 5", "C. 6"],
-        "solutionsDetails": ""
+        "solutionsDetails": "Whats the least amount of given values required to create a unique-solution pyramid?"
     },
     "A6": {
         "type": "A6-Question 6: Design and Solve a Pyramid with Limited Information",
@@ -500,17 +500,26 @@ function navigate(next) {
     const params = new URLSearchParams(window.location.search);
     const category = params.get('category') || 'C';
     let questionNumber = parseInt(params.get('question')) || 1;
-    questionNumber += next ? 1 : -1;
 
-    const nextQuestionId = `${category}${questionNumber}`;
-
-    if (questionData[nextQuestionId]) {
-        history.pushState(null, '', `?category=${category}&question=${questionNumber}`);
-        loadQuestion(nextQuestionId);
+    // 如果是返回上一题
+    if (!next && questionNumber === 1) {
+        // 如果已经是第一题，返回到 selection.html
+        window.location.href = 'selection.html';
     } else {
-        alert("No more questions available.");
+        // 否则跳到上一题或下一题
+        questionNumber += next ? 1 : -1;
+
+        const nextQuestionId = `${category}${questionNumber}`;
+
+        if (questionData[nextQuestionId]) {
+            history.pushState(null, '', `?category=${category}&question=${questionNumber}`);
+            loadQuestion(nextQuestionId);
+        } else {
+            alert("No more questions available.");
+        }
     }
 }
+
 
 async function submitAnswers() {
     const userAnswers = {
