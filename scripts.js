@@ -1,9 +1,19 @@
+import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js';
+ 
+// Supabase configuration
+ const supabaseUrl = 'https://zbipgwnckowcieirvyce.supabase.co';
+ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpiaXBnd25ja293Y2llaXJ2eWNlIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NDkwNjI5NywiZXhwIjoyMDYwNDgyMjk3fQ.1BNrvBt0xuYTzJp5Rf4Ls3OD8Ss7XzrHWeO_41tcl28';
+ 
+ const supabase = createClient(supabaseUrl, supabaseKey);
+ 
+ console.log('Supabase client initialized.');
+
 const questionData = {
     "A1": {
         "type": "A1-Question 1: Solve the 5-Level Pyramid with a Given Value",
         "task": (
             "Welcome to the Brick Pyramid Challenge! In this problem, you will apply logical reasoning and step-by-step calculations to fill in missing values in a 5-level pyramid.\n" +
-            "Each brick follows a simple rule:\n" +
+            "Each brick follows a simple rule:\n " +
             "Every brick is the sum of the two bricks directly below it.\n" +
             "In this pyramid, one value is already given—the bottom-left brick is 5.\n" +
             "Your task is to fill in the missing numbers so that the pyramid follows the rule."
@@ -215,13 +225,18 @@ const questionData = {
             "In our pyramid problem, we have three different types of solutions:\n" +
             "Unique Solution: The pyramid has a unique solution, meaning that there is only one possible way to fill in the missing values.\n" +
             "Multiple Solutions: The pyramid has multiple solutions, meaning that there are many different possible ways to fill in the missing values.\n" +
-            "No Solution: The pyramid has no solution, meaning that there is no possible way to assign values to the missing bricks while satisfying the pyramid rule."
+            "No Solution: The pyramid has no solution, meaning that there is no possible way to assign values to the missing bricks while satisfying the pyramid rule.\n" 
         ),
         "img": "img/B/b4.png",
         "hints": [],
-        "choices": ["A. Unique Solution", "B. Multiple Solutions", "C. No Solution"],
-        "solutionsDetails": "Main task: Determine solution types for each pyramid.",
+        "solutionsDetails": "A. Unique Solution, B. Multiple Solutions, C. No Solution .\n"+
+                            "\n"+
+                            "Main task: Determine solution types for each pyramid.\n"+
+                            "Pyramid A has(a) .\n"+
+                            "Pyramid B has(a) .\n"+
+                            "Pyramid C has(a) .",
         "additionalInput": "Please explain your reason(s)."
+     
     },
     "B5": {
         "type": "B5-Question 5: Solve the 5-Level Pyramid and Identify Its Solution Type",
@@ -298,7 +313,7 @@ const questionData = {
             [null, null],
             [null, null, null],
             [null, null, null, null],
-            [1, 2, 3, 4, 5]
+            [1, 3, 3, 4, 5]
         ],
         "pyramidColors": [
             [true],
@@ -379,7 +394,19 @@ const questionData = {
     }
 };
 
-function loadQuestion(questionId) {
+const userAnswersStore = {}; // 初始化用户答案存储对象
+
+ document.addEventListener('DOMContentLoaded', function() {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const category = urlParams.get('category') || 'C';
+    const questionNumber = parseInt(urlParams.get('question')) || 1;
+    const questionId = `${category}${questionNumber}`;
+
+    loadQuestion(questionId);
+});
+
+export function loadQuestion(questionId) {
     const question = questionData[questionId];
     if (!question) return;
 
@@ -387,7 +414,6 @@ function loadQuestion(questionId) {
     document.getElementById('questionText').innerText = question.task.replace(/\n/g, "\n");
     document.getElementById('taskDetails').innerText = question.solutionsDetails.replace(/\n/g, "\n");
 
-    // 设置图片路径
     const questionImage = document.getElementById('questionImage');
     if (question.img) {
         questionImage.src = question.img;
@@ -397,7 +423,7 @@ function loadQuestion(questionId) {
     }
 
     if (question.pyramidStructure && question.pyramidColors) {
-        renderPyramid(question.pyramidStructure, question.pyramidColors);
+        renderPyramid(question.pyramidStructure, question.pyramidColors, questionId);
     } else {
         document.getElementById('interactiveArea').innerHTML = '';
     }
@@ -413,61 +439,51 @@ function loadQuestion(questionId) {
             choiceButton.className = 'choice-btn';
             choiceButton.innerText = choice;
             choiceButton.addEventListener('click', () => {
-                alert(`You selected: ${choice}`);
+                choicesContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
+                choiceButton.classList.add('selected');
+                if (!userAnswersStore[questionId]) {
+                    userAnswersStore[questionId] = {};
+                }
+                userAnswersStore[questionId].selectedChoice = index;
             });
+
             choicesContainer.appendChild(choiceButton);
         });
+
+        if (userAnswersStore[questionId]?.selectedChoice !== undefined) {
+            choicesContainer.children[userAnswersStore[questionId].selectedChoice].classList.add('selected');
+        }
     }
 
     const explanationElement = document.getElementById('explanation');
+    explanationElement.value = ''; // 清除文本框内容
     if (question.additionalInput) {
         explanationElement.style.display = 'block';
         explanationElement.placeholder = question.additionalInput;
+        explanationElement.value = userAnswersStore[questionId]?.explanation || ''; // 恢复每题的答案
+        explanationElement.oninput = (e) => {
+            if (!userAnswersStore[questionId]) {
+                userAnswersStore[questionId] = {};
+            }
+            userAnswersStore[questionId].explanation = e.target.value;
+        };
     } else {
         explanationElement.style.display = 'none';
+        explanationElement.value = ''; // 确保空白
     }
-}
 
-
-
-
-function setupHints(hints) {
-    const hintList = document.getElementById('hintList');
-    hintList.innerHTML = '';  // 清空现有的提示
-
-    hints.forEach((hint, index) => {
-        const hintItem = document.createElement('li');
-        hintItem.className = 'hint';
-        hintItem.innerText = `Hint ${index + 1}: ${hint}`;
-        hintList.appendChild(hintItem);
-    });
-}
-
-function toggleHints() {
-    const hintList = document.getElementById('hintList');
-    hintList.classList.toggle('hidden');
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    const category = urlParams.get('category') || 'C';
-    const questionNumber = parseInt(urlParams.get('question')) || 1;
-    const questionId = `${category}${questionNumber}`;
-
-    console.log(`Loading question ${questionId}`);  // 调试输出
-
-    loadQuestion(questionId);
-
-    const LAST_QUESTION_NUMBER = 6; // 根据实际需要定义最后题目编号
-    if (questionNumber === LAST_QUESTION_NUMBER) {
-        document.getElementById('submitButtonContainer').style.display = 'block';
+    const submitButtonContainer = document.getElementById('submitButtonContainer');
+    if (questionId === 'A6' || questionId === 'B6' || questionId === 'C6') {
+        submitButtonContainer.style.display = 'block';
+    } else {
+        submitButtonContainer.style.display = 'none';
     }
-});
 
+    const hintList = document.getElementById('hintList');
+    hintList.classList.add('hidden');
+}
 
-
-function renderPyramid(pyramidStructure, pyramidColors) {
+function renderPyramid(pyramidStructure, pyramidColors, questionId) {
     const pyramidContainer = document.getElementById('interactiveArea');
     pyramidContainer.innerHTML = '';
 
@@ -479,38 +495,44 @@ function renderPyramid(pyramidStructure, pyramidColors) {
             const box = document.createElement('div');
             box.className = 'box';
             const editable = pyramidColors[rowIndex][colIndex];
-
             if (editable) {
                 const input = document.createElement('input');
                 input.type = 'text';
-                input.value = value !== null ? value : '';
+                const storedValue = userAnswersStore[questionId]?.pyramidAnswers?.[rowIndex]?.[colIndex];
+                input.value = storedValue !== undefined ? storedValue : '';
+                input.addEventListener('input', (e) => {
+                    if (!userAnswersStore[questionId]) {
+                        userAnswersStore[questionId] = {};
+                    }
+                    if (!userAnswersStore[questionId].pyramidAnswers) {
+                        userAnswersStore[questionId].pyramidAnswers = pyramidStructure.map(row => row.map(() => null));
+                    }
+                    userAnswersStore[questionId].pyramidAnswers[rowIndex][colIndex] = e.target.value;
+                });
                 box.appendChild(input);
             } else {
                 box.textContent = value !== null ? value : '';
             }
-            
             pyramidRow.appendChild(box);
         });
-
         pyramidContainer.appendChild(pyramidRow);
     });
 }
 
-function navigate(next) {
+
+
+
+export function navigate(next) {
     const params = new URLSearchParams(window.location.search);
     const category = params.get('category') || 'C';
     let questionNumber = parseInt(params.get('question')) || 1;
 
-    // 获取当前题目的 ID
     const currentQuestionId = `${category}${questionNumber}`;
 
-    // 如果是返回上一题
     if (!next) {
-        // 检查是否是 A1、B1,C1，若是，则返回到 selection.html
         if (currentQuestionId === 'A1' || currentQuestionId === 'B1' || currentQuestionId === 'C1') {
             window.location.href = 'selection.html';
         } else {
-            // 否则返回上一题
             questionNumber -= 1;
             const previousQuestionId = `${category}${questionNumber}`;
             if (questionData[previousQuestionId]) {
@@ -521,10 +543,8 @@ function navigate(next) {
             }
         }
     } else {
-        // 否则，跳到下一题
         questionNumber += 1;
         const nextQuestionId = `${category}${questionNumber}`;
-
         if (questionData[nextQuestionId]) {
             history.pushState(null, '', `?category=${category}&question=${questionNumber}`);
             loadQuestion(nextQuestionId);
@@ -535,49 +555,69 @@ function navigate(next) {
 }
 
 
+function setupHints(hints) {
+    const hintList = document.getElementById('hintList');
+    hintList.innerHTML = ''; 
+    if (hints && hints.length > 0) {
+        hints.forEach((hint, index) => {
+            const hintItem = document.createElement('li');
+            hintItem.className = 'hint';
+            hintItem.innerText = `Hint ${index + 1}: ${hint}`;
+            hintList.appendChild(hintItem);
+        });
+    }
+}
 
-async function submitAnswers() {
-    const userAnswers = {
-        taskDetails: document.getElementById('taskDetails').innerText,
-        explanation: document.getElementById('explanation').value
-    };
+export function toggleHints() {
+    const hintList = document.getElementById('hintList');
+    hintList.classList.toggle('hidden');
+}
 
-    // GitHub API 操作
+export async function submitAllAnswers() {
     try {
-        const fileResponse = await fetch(`https://api.github.com/repos/<owner>/<repo>/contents/results.json`, {
-            headers: {
-                Authorization: `token ${token}`
+        const category = window.location.search.split('category=')[1][0] || 'C'; // 获取题目类型
+
+        // 在这里构建整个用户答案对象
+        const userAnswersRecord = {
+            category: category,
+        };
+
+        for (let i = 1; i <= 6; i++) { // 假设题目数量为6
+            const questionId = `${category}${i}`;
+            const answerData = userAnswersStore[questionId];
+            const questionInfo = questionData[questionId];
+
+            if (answerData && questionInfo) {
+                const selectedChoiceIndex = answerData.selectedChoice;
+                let selectedChoiceContent = null;
+                if (questionInfo.choices && selectedChoiceIndex !== undefined) {
+                    selectedChoiceContent = questionInfo.choices[selectedChoiceIndex];
+                }
+
+                const explanation = answerData.explanation || '';
+                const pyramidData = answerData.pyramidAnswers || [];
+
+                // 按照题目ID，金字塔结构，选择题内容和解释的数据结构存储
+                userAnswersRecord[`question${i}_id`] = questionId;
+                userAnswersRecord[`question${i}_pyramid_structure`] = JSON.stringify(pyramidData);
+                userAnswersRecord[`question${i}_selected_choice`] = selectedChoiceContent || '';
+                userAnswersRecord[`question${i}_explanation`] = explanation || '';
             }
-        });
-
-        if (!fileResponse.ok) {
-            throw new Error('Failed to fetch file information.');
         }
 
-        const file = await fileResponse.json();
-        const sha = file.sha;
+        // 插入到数据库中
+        const { error } = await supabase.from('useranswers').insert([userAnswersRecord]);
 
-        const encodedContent = btoa(JSON.stringify(userAnswers));
-
-        const result = await fetch(`https://api.github.com/repos/<owner>/<repo>/contents/results.json`, {
-            method: 'PUT',
-            headers: {
-                Authorization: `token ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                message: 'Update results',
-                content: encodedContent,
-                sha: sha
-            })
-        });
-
-        if (result.ok) {
-            window.location.href = 'end.html';
-        } else {
-            throw new Error('Failed to update file.');
+        if (error) {
+            console.error('Error inserting data:', error);
+            alert('There was an error submitting your answers.');
+            return;
         }
-    } catch (error) {
-        console.error('Error:', error);
+
+        alert('All your answers have been submitted successfully.');
+        window.location.href = 'end.html'; // 页面重定向
+    } catch (err) {
+        console.error('Error:', err);
+        alert('An error occurred while submitting your answers.');
     }
 }
